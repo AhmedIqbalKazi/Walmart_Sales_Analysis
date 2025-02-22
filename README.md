@@ -1,5 +1,5 @@
 
-# Walmart Data Analysis: End-to-End SQL + Python 
+# Walmart Data Analysis: End-to-End SQL + Python Project P-9
 
 ## Project Overview
 
@@ -48,9 +48,9 @@ This project is an end-to-end data analysis solution designed to extract critica
    - **Create New Columns**: Calculate the `Total Amount` for each transaction by multiplying `unit_price` by `quantity` and adding this as a new column.
    - **Enhance Dataset**: Adding this calculated field will streamline further SQL analysis and aggregation tasks.
 
-### 8. Load Data into MySQL 
-   - **Set Up Connections**: Connect to MySQL  using `sqlalchemy` and load the cleaned data into each database.
-   - **Table Creation**: Set up tables in  MySQL using Python SQLAlchemy to automate table creation and data insertion.
+### 8. Load Data into MySQL and PostgreSQL
+   - **Set Up Connections**: Connect to MySQL and PostgreSQL using `sqlalchemy` and load the cleaned data into each database.
+   - **Table Creation**: Set up tables in both MySQL and PostgreSQL using Python SQLAlchemy to automate table creation and data insertion.
    - **Verification**: Run initial SQL queries to confirm that the data has been loaded accurately.
 
 ### 9. SQL Analysis: Complex Queries and Business Problem Solving
@@ -133,7 +133,30 @@ This project is an end-to-end data analysis solution designed to extract critica
        ORDER BY branch, num_invoices DESC;
        ```
 
+     - **Identify the 5 branches with the highest revenue decrease ratio from last year to current year**
+       ```sql
+       WITH revenue_2022 AS (
+           SELECT Branch, SUM(Total_Price) AS Revenue
+           FROM walmart
+           WHERE YEAR(`date`) = 2022
+           GROUP BY Branch
+       ), revenue_2023 AS (
+           SELECT Branch, SUM(Total_Price) AS Revenue
+           FROM walmart
+           WHERE YEAR(`date`) = 2023
+           GROUP BY Branch
+       )
+       SELECT r2022.Branch, r2022.revenue AS last_year_revenue, r2023.revenue AS current_year_revenue,
+              ROUND(((r2022.revenue - r2023.revenue) / r2022.revenue) * 100, 2) AS revenue_decrease_ratio
+       FROM revenue_2022 AS r2022
+       JOIN revenue_2023 AS r2023 ON r2022.Branch = r2023.Branch
+       WHERE r2022.revenue > r2023.revenue
+       ORDER BY revenue_decrease_ratio DESC
+       LIMIT 5;
+       ```
+
 ---
+
 
 ## Requirements
 
